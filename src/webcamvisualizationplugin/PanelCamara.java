@@ -17,6 +17,7 @@ import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
+import static javafx.scene.media.MediaPlayer.Status.PLAYING;
 import javafx.scene.media.MediaView;
 import javafx.util.Duration;
 import javax.swing.JPanel;
@@ -32,8 +33,12 @@ public class PanelCamara extends JPanel{
     private MediaPlayer mediaPlayer;
     MediaView mediaView;
     public long end;
+    private boolean isPlaying=false;
+    private boolean isSync = false;
+    double velocidad = 1;
     long seekSlider=0;
     int cambio = 0;
+    double deltaT;
      
     private void initFxLater(JFXPanel panel){
         Group root = new Group();
@@ -79,15 +84,54 @@ public class PanelCamara extends JPanel{
         return this;
     }
     
-    public void play(){
-        mediaPlayer.play();
+    public void play(long millis){
+        if(millis<end){
+            mediaPlayer.play();
+            isPlaying=true;           
+            
+             /*if(!isPlaying){
+                mediaPlayer.setRate(velocidad);
+                velocidad=1;
+                mediaPlayer.play();
+                isPlaying=true;
+            }
+             if(isSync){
+                if(millis%150==0){            
+                    deltaT = mediaPlayer.getCurrentTime().toMillis()-millis;
+                    if((int)deltaT>0){
+                        if(velocidad>=0.1){
+                            velocidad = velocidad-0.05;
+                            mediaPlayer.setRate(velocidad);                    
+                        }
+                    }else if((int)deltaT<0){
+                        if(velocidad<=1.1){
+                            velocidad = velocidad+0.05;       
+                            mediaPlayer.setRate(velocidad);             
+                        }
+                    } 
+                }                 
+            }*/   
+        }         
     }
+    
+    public void play2(long millis){
+        if(mediaPlayer.getCurrentTime().toMillis()>millis){
+            mediaPlayer.pause();
+        }
+    }
+    
     public void stop(){
         mediaPlayer.stop();
+        isPlaying=false;
     }
     public void pause(){
         mediaPlayer.pause();
+        isPlaying=false;
     }
+    public void sync(boolean sync){
+        isSync=sync;
+    }
+    
     public void current(long sw){
         new Thread(new Runnable() {
 
