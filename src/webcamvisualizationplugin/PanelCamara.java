@@ -26,7 +26,7 @@ import javax.swing.JPanel;
  *
  * @author Khrikhri
  */
-public class PanelCamara extends JPanel{
+public class PanelCamara extends JFXPanel{
     
     private File MEDIA_URL;
     private Media media;
@@ -40,7 +40,11 @@ public class PanelCamara extends JPanel{
     int cambio = 0;
     double deltaT;
      
-    private void initFxLater(JFXPanel panel){
+    public PanelCamara(File file){
+        
+        MEDIA_URL = file;
+        final JFXPanel jFXPanel = new JFXPanel();
+        this.setLayout(new BorderLayout());
         Group root = new Group();
          
         try {
@@ -66,21 +70,10 @@ public class PanelCamara extends JPanel{
         Scene scene = new Scene(root, mediaView.getFitWidth(), mediaView.getFitHeight());
         ((Group)scene.getRoot()).getChildren().add(mediaView);
          
-        panel.setScene(scene);
-    }
-    
-    
-    public PanelCamara(File file){
-        
-        MEDIA_URL = file;
-        final JFXPanel jFXPanel = new JFXPanel();
-        this.setLayout(new BorderLayout());
-        initFxLater(jFXPanel);
-        this.setSize(640,480);         
-        add(jFXPanel);
+        setScene(scene);
     }
  
-    public JPanel getPanel() {
+    public JFXPanel getPanel() {
         return this;
     }
     
@@ -116,5 +109,8 @@ public class PanelCamara extends JPanel{
                     mediaPlayer.seek(Duration.millis(sw)); 
             }
         }).start();
-    } 
+    }    
+    public MediaPlayer.Status getStatus(){
+       return mediaPlayer.getStatus();
+    }
 }
