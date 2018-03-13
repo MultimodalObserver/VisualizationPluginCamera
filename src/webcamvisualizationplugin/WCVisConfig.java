@@ -64,7 +64,7 @@ public class WCVisConfig implements VisualizableConfiguration {
     
     private void ensurePlayerCreated() {
         if (player == null && !files.isEmpty()) {
-            player = new WCPlayer(files.get(0));
+            player = new WCPlayer(files.get(0),id);
         }
     }
 

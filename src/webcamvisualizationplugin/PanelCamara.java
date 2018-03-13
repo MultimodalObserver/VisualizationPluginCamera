@@ -26,7 +26,7 @@ import javax.swing.JPanel;
  *
  * @author Khrikhri
  */
-public class PanelCamara extends JFXPanel{
+public class PanelCamara extends JPanel{
     
     private File MEDIA_URL;
     private Media media;
@@ -39,78 +39,55 @@ public class PanelCamara extends JFXPanel{
     long seekSlider=0;
     int cambio = 0;
     double deltaT;
-     
+    
     public PanelCamara(File file){
-        
-        MEDIA_URL = file;
-        final JFXPanel jFXPanel = new JFXPanel();
-        this.setLayout(new BorderLayout());
-        Group root = new Group();
-         
-        try {
-            // create media player
-            media = new Media(MEDIA_URL.toURI().toURL().toString());
-        } catch (MalformedURLException ex) {
-            Logger.getLogger(PanelCamara.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        mediaPlayer = new MediaPlayer(media);   
-        mediaPlayer.setOnReady(new Runnable() {
-            @Override
-            public void run() {
-                end=(long)media.getDuration().toMillis();
+        pane p = new pane(file);
+        setLayout(new BorderLayout());
+        p.setSize(getSize());
+        p.setVisible(true);
+        this.add(p);
+    }
+     
+    public class pane extends JFXPanel{
+    
+        public pane(File file){
+
+            MEDIA_URL = file;
+            final JFXPanel jFXPanel = new JFXPanel();
+            this.setLayout(new BorderLayout());
+            Group root = new Group();
+
+            try {
+                // create media player
+                media = new Media(MEDIA_URL.toURI().toURL().toString());
+            } catch (MalformedURLException ex) {
+                Logger.getLogger(PanelCamara.class.getName()).log(Level.SEVERE, null, ex);
             }
-        });
-        //mediaPlayer.setRate(0.9);
-               // create mediaView and add media player to the viewer
-        mediaView = new MediaView(mediaPlayer);
-                DoubleProperty width = mediaView.fitWidthProperty();
-                DoubleProperty height = mediaView.fitHeightProperty();
-                width.bind(Bindings.selectDouble(mediaView.sceneProperty(),"width"));
-                height.bind(Bindings.selectDouble(mediaView.sceneProperty(),"height"));
-        Scene scene = new Scene(root, mediaView.getFitWidth(), mediaView.getFitHeight());
-        ((Group)scene.getRoot()).getChildren().add(mediaView);
-         
-        setScene(scene);
+            mediaPlayer = new MediaPlayer(media);   
+            mediaPlayer.setOnReady(new Runnable() {
+                @Override
+                public void run() {
+                    end=(long)media.getDuration().toMillis();
+                }
+            });
+            //mediaPlayer.setRate(0.9);
+                   // create mediaView and add media player to the viewer
+            mediaView = new MediaView(mediaPlayer);
+                    DoubleProperty width = mediaView.fitWidthProperty();
+                    DoubleProperty height = mediaView.fitHeightProperty();
+                    width.bind(Bindings.selectDouble(mediaView.sceneProperty(),"width"));
+                    height.bind(Bindings.selectDouble(mediaView.sceneProperty(),"height"));
+            Scene scene = new Scene(root, mediaView.getFitWidth(), mediaView.getFitHeight());
+            ((Group)scene.getRoot()).getChildren().add(mediaView);
+
+            setScene(scene);
+        }
     }
  
-    public JFXPanel getPanel() {
+    public JPanel getPanel() {
         return this;
     }
-    
-    public void play(){
-        mediaPlayer.play();
-        isPlaying=true;      
-    }
-    
-    public void play2(long frame){
-        if(mediaPlayer.getCurrentTime().toMillis()>=frame && isPlaying){
-            mediaPlayer.pause();
-            isPlaying=false;
-        }
-    }
-    
-    public void stop(){
-        mediaPlayer.stop();
-        isPlaying=false;
-    }
-    public void pause(){
-        mediaPlayer.pause();
-        isPlaying=false;
-    }
-    public void sync(boolean sync){
-        isSync=sync;
-    }
-    
-    public void current(long sw){
-        new Thread(new Runnable() {
-
-            @Override
-            public void run() {
-                    mediaPlayer.seek(Duration.millis(sw)); 
-            }
-        }).start();
-    }    
-    public MediaPlayer.Status getStatus(){
-       return mediaPlayer.getStatus();
+    public MediaPlayer getMP(){
+        return mediaPlayer;
     }
 }
