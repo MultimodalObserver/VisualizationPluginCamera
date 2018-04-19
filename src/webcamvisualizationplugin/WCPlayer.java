@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.application.Platform;
 import javafx.scene.media.MediaPlayer;
 import static javafx.scene.media.MediaPlayer.Status.STOPPED;
 import javafx.util.Duration;
@@ -21,23 +22,26 @@ public class WCPlayer implements Playable{
 
     private long start;
     private long end;
-    private ArrayList<Long> frames = new ArrayList<Long>();
+    //private ArrayList<Long> frames = new ArrayList<Long>();
     private boolean isSync=false;
     private boolean isPlaying=false;
     private static PanelCamara wcpanel;
     private String path;
     private int cont=0;
     private MediaPlayer mediaPlayer;
+    private String id;
     
 
     private static final Logger logger = Logger.getLogger(WCPlayer.class.getName());
 
     public WCPlayer(File file, String id) {
+            this.id = id;
             wcpanel = new PanelCamara(file);
             mediaPlayer = wcpanel.getMP();
+            Platform.setImplicitExit(false);
             path = file.getAbsolutePath();
             String path2 =  path.substring(0,path.lastIndexOf(".")) + "-temp.txt";
-            String path3 =  path.substring(0,path.lastIndexOf(".")) + "-frames.txt";
+            //String path3 =  path.substring(0,path.lastIndexOf(".")) + "-frames.txt";
             String cadena;
             FileReader f;
             FileReader f2;
@@ -57,11 +61,16 @@ public class WCPlayer implements Playable{
             } catch (FileNotFoundException ex) {
                 logger.log(Level.SEVERE, null, ex);
             }
-            try {
+            /*try {
                 f2 = new FileReader(path3);
                 BufferedReader b = new BufferedReader(f2);
+                int read=0;
                 try {
                     while((cadena=b.readLine())!=null){
+                        if(read==0){
+                            //start=Long.parseLong(cadena);
+                            read=1;
+                        }
                         frames.add(Long.parseLong(cadena));
                     }
                     b.close();
@@ -70,14 +79,15 @@ public class WCPlayer implements Playable{
                 }
             } catch (FileNotFoundException ex) {
                 logger.log(Level.SEVERE, null, ex);
-            }
+            }*/
             try {
                 Thread.sleep(50);
             } catch (InterruptedException ex) {
                 logger.log(Level.SEVERE, null, ex);
             }
             
-            DockableElement e = new DockableElement(id);
+            DockableElement e = new DockableElement();
+            e.setTitleText(id);
             e.add(wcpanel);
             DockablesRegistry.getInstance().addAppWideDockable(e);                
     }
@@ -109,11 +119,11 @@ public class WCPlayer implements Playable{
                     mediaPlayer.seek(Duration.millis(0));  
             }
         }).start();
-        }
+        }/*
         cont=0;
         while(frames.get(cont)<desiredMillis){
             cont++;
-        }
+        }*/
     }
     
     @Override
@@ -127,30 +137,45 @@ public class WCPlayer implements Playable{
     } 
 
     @Override
-    public void play(long millis) {
-        if(millis>=start && millis<=end){
+    public void play(long millis){
+        if(millis>=start && millis<=end){  
             if(isSync){
-                if(frames.size()>cont){
+                /*if(frames.size()>cont){             
+                
                     if(frames.get(cont)==millis){
-                        if(cont != 0){
                             isPlaying=true;
                             mediaPlayer.play();
-                            cont++; 
+                            cont++;
+                    }
+                    else {
+                        long time = (long) (mediaPlayer.getCurrentTime().toMillis()+start);
+                        if(frames.get(cont)<time && isPlaying){
+                            mediaPlayer.pause();
+                            isPlaying=false;
+                        }                        
+                        if(frames.get(cont)>millis && !isPlaying){
+                            mediaPlayer.play();
+                            isPlaying=true;
                         }
-                        if(cont==0){
-                            isPlaying=true;
-                            mediaPlayer.play();
-                            cont++;                            
+                   }                    
+                }*/
+                if((millis-start)%90==0){
+                    if((millis-start)<mediaPlayer.getCurrentTime().toMillis()){
+                        if(isPlaying){                            
+                            mediaPlayer.pause();
+                            isPlaying=false;
                         }
                     }
-                    else if(frames.get(cont)>millis && isPlaying){
-                        mediaPlayer.pause();
-                        isPlaying=false;
+                    else{
+                        if(!isPlaying){
+                            mediaPlayer.play();
+                            isPlaying=true;
+                        }
                     }
                 }
             }
             else{
-                if(!isPlaying){                    
+                if(!isPlaying){               
                     isPlaying=true;
                     mediaPlayer.play();
                 }

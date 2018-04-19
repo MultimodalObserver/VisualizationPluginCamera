@@ -72,6 +72,7 @@ public class WCVisConfig implements VisualizableConfiguration {
     public void addFile(File file) {
         if ( !files.contains(file) ) {
             this.files.add(file);
+            player = new WCPlayer(files.get(files.size()-1),id);
         }
     }
 
