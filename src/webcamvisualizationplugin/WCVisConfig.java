@@ -24,6 +24,11 @@ public class WCVisConfig implements VisualizableConfiguration {
         files = new ArrayList<>();
     }
     
+    public WCVisConfig(String id) {
+        this(); 
+        this.id = id;
+    }
+    
    @Override
     public String getId() {
         return id;

@@ -10,6 +10,14 @@
 <project name="WebCamVisualizationPlugin" default="default" basedir=".">
     <description>Builds, tests, and runs the project WebCamVisualizationPlugin.</description>
     <import file="nbproject/build-impl.xml"/>
+    <target name="-post-jar">
+        <jar jarfile="${dist.jar}" update="true">
+            <manifest>
+                <attribute name="Main-Class" value="webcamvisualizationplugin.WebCamVisualizationPlugin"/>
+            </manifest>
+        </jar>
+    </target>
+
     <!--
 
     There exist several targets which are by default empty and which can be 
